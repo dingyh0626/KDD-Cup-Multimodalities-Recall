@@ -1,7 +1,7 @@
 ## KDD-Cup-Multimodalities-Recall
 
 [KDD-Cup-Multimodalities-Recall](https://tianchi.aliyun.com/competition/entrance/231786/rankingList/1)
-第10名来自垫底小分队的方案。
+第10名来自垫底小分队的方案。ndcg@5指标：A榜单模model1得分0.6969，双模集成得分0.7158；B榜双模集成得分0.7276
 
 ### 方案
 #### 预训练（[`multilabel`](multilabel)）：
@@ -15,12 +15,10 @@
 - 对每个单词生成一个权重。
 - 使用上述权重对单词匹配分加权平均得到最终得分。
 - 训练方式为paiwise。
-- 线下ndcg@5超72.5。
 
 #### 基于句子与图片的匹配模型（[`model2`](model2)）
 - 使用预训练的图片embedding（查询文本生成任务得到）和整个查询文本计算匹配分，对图片的encoder进行fine tuning。
 - 训练方式为pointwise。
-- 线下ndcg@5超71。
 
 #### 集成（[`ensemble.ipynb`](ensemble.ipynb)）
 - 对上述两个模型的得分进行加权平均作为最终得分。
