@@ -3,6 +3,9 @@
 [KDD-Cup-Multimodalities-Recall](https://tianchi.aliyun.com/competition/entrance/231786/rankingList/1)
 第10名来自垫底小分队的方案。ndcg@5指标：A榜单模model1得分0.6969，双模集成得分0.7158；B榜双模集成得分0.7276。
 
+部分数据请到[阿里云code](https://code.aliyun.com/zjhndyhnba/KDD-Cup-Multimodalities-Recall.git)下载。
+
+
 ### 方案
 #### 预训练（[`multilabel`](multilabel)）：
 - 对每个query文本进行分词，并去除停用词，每个词作为一个标签。
