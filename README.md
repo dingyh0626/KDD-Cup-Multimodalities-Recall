@@ -37,7 +37,15 @@
 （根据文本最后一个单词进行归类以及基于早期模型训练得到的文本embedding的K-Means聚类，目的是用于困难样本挖掘）等信息。
 - 并行训练启动方式：`python -u -m torch.distributed.launch --nproc_per_node=${number of GPUs} train.py`
 - `utils.py`文件中对训练数据的读取代码需要自行修改。为了避免一次性读入120G数据，我们将原本训练集中的base64字符串全部存成单个文件，
-即一个product的base64存成一个文件，文件名为product的id，而读入的训练数据csv只包含文本以及product的索引信息。只有在product轮到训练时，从硬盘读入内存。
+即一个product的base64存成一个文件，文件名为product的id，而读入的训练数据**`info/data.pkl`**只包含文本以及product的索引信息。只有在product轮到训练时，从硬盘读入内存。
 实验发现，只要product存到固态硬盘，可在节约内存同时保证GPU利用率。
+- product数据使用`np.savez_compressed`函数进行存储：`np.savez_compressed('/.../{product_id}.npz', features=features, boxes=boxes)`，
+其中`features`为base64解码的形如[num_obj, 2048]的`ndarray`，同样`boxes`为形如[num_obj, 4]的`ndarray`，读取代码如下：
+
+```python
+data = np.load('/.../{product_id}.npz')
+features = data['features']
+boxes = data['boxes']
+```
 - 为方便跑通，使用`utils_backup.py`将训练集直接加载到内存（未经测试，可能存在bug）。
 
