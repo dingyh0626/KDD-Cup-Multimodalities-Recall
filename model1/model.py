@@ -138,6 +138,100 @@ class ImageEncoder(nn.Module):
         return embedding
 
 
+class TextEncoder(nn.Module):
+
+    def __init__(self, vocab_size, word_dim, embed_size, num_layers=2, use_bert=False):
+        super(TextEncoder, self).__init__()
+        self.use_bert = use_bert
+        if use_bert:
+            word_dim = 1024
+            bert = BertModel.from_pretrained(pretrained_large)
+            self.embed = bert.get_input_embeddings()
+
+            # ckpt = torch.load('/data/data_dyh/kdd_ckpt/ckpt_clf/checkpoints/image_encoder_large.pth',
+            #                   map_location='cpu')
+            #
+            #
+            # weight1 = bert.get_input_embeddings().weight
+            # weight2 = ckpt['weight']
+            # weight = torch.cat([weight1, weight2], 0)
+            # self.embed = nn.Embedding.from_pretrained(weight, padding_idx=0)
+            for p in self.embed.parameters():
+                p.requires_grad_(False)
+
+            # self.norm = nn.LayerNorm(word_dim)
+            self.norm = bert.embeddings.LayerNorm
+            for p in self.norm.parameters():
+                p.requires_grad_(False)
+        else:
+            self.embed = nn.Embedding(vocab_size, word_dim)
+            self.norm = nn.LayerNorm(word_dim)
+        self.embed_size = embed_size
+        self.rnn = nn.GRU(word_dim, embed_size, num_layers, batch_first=True, bidirectional=True, dropout=0.1)
+        # self.dense_hidden = nn.Sequential(
+        #     nn.Linear(embed_size, word_dim),
+        #     nn.PReLU(),
+        #     nn.Linear(word_dim, word_dim)
+        # )
+        # self.W = nn.Sequential(
+        #     nn.Linear(embed_size, word_dim),
+        #     nn.PReLU()
+        # )
+        # self.dense_summary = nn.Sequential(
+        #     nn.Linear(embed_size, 100),
+        #     nn.PReLU(),
+        #     nn.Linear(100, 1)
+        # )
+        self.start_token = 101
+        self.end_token = 102
+        self.mask_token = 0
+        # self.dense = nn.Sequential(
+        #     nn.Linear(embed_size, embed_size),
+        #     nn.ELU(inplace=True)
+        # )
+
+    def get_params(self):
+        return [
+            # {'params': self.embed.parameters(), 'initial_lr': 1e-5, 'weight_decay': 1e-6},
+            # {'params': self.norm.parameters(), 'initial_lr': 1e-5, 'weight_decay': 1e-6},
+            {'params': self.rnn.parameters(), 'initial_lr': 1e-4},
+            # {'params': self.dense_summary.parameters(), 'initial_lr': 1e-4},
+            # {'params': self.dense_hidden.parameters(), 'initial_lr': 1e-3},
+        ]
+
+
+    def forward(self, x, lengths):
+        """Handles variable size captions
+        """
+        # Embed word ids to vectors
+        # mask = x.data.eq(self.start_token) | x.data.eq(self.end_token) | x.data.eq(self.mask_token)
+
+        embedding = self.embed(x)
+        # x = embedding
+        x = self.norm(embedding)
+        batch_size, max_length, _ = x.size()
+        packed = pack_padded_sequence(x, lengths, batch_first=True, enforce_sorted=False)
+
+        # Forward propagate RNN
+        packed, hidden = self.rnn(packed)
+        x, _ = pad_packed_sequence(packed, batch_first=True, total_length=max_length)
+        # hidden = (hidden[-1] + hidden[-2]) / 2
+        # hidden = self.dense_hidden(hidden)
+        # x = self.dense(x)
+        # x = x.view(batch_size, max_length, 2, -1)
+        # x = self.dense(x)
+        # x = x.view(batch_size, max_length, 2, -1)
+        x = (x[..., :self.embed_size] + x[..., self.embed_size:]) / 2.
+
+
+        # mask = lengths2mask(lengths, embedding.size(1))
+        # summary_score = self.dense_summary(x).squeeze_(-1)
+        # summary_score.masked_fill_(mask, -float('inf'))
+        # summary_score = torch.softmax(summary_score, -1)
+        # return embedding, summary_score
+        hidden = x
+        return embedding, hidden
+
 
 class ScoreModel(nn.Module):
     def __init__(self, embed_dim=1024, hidden_dim=256):

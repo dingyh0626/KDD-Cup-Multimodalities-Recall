@@ -5,7 +5,7 @@ from torch.optim import Adam, SGD
 from torch.optim.lr_scheduler import ExponentialLR
 
 from multilabel import MultiLabelClassifier
-from utils_backup import Dataset, collate_fn, DataLoader
+from utils import Dataset, collate_fn, DataLoader
 from tqdm import tqdm
 
 from validation import valid

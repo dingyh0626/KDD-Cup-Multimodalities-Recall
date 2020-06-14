@@ -21,7 +21,7 @@ from torch.optim import Adam
 from torch.optim.lr_scheduler import ExponentialLR
 
 from model import TextEncoder, ImageEncoder, ScoreModel, ContrastiveLoss
-from utils_backup import Dataset, collate_fn, DataLoader
+from utils import Dataset, collate_fn, DataLoader
 from tqdm import tqdm
 import torch.nn.functional as F
 
@@ -36,7 +36,7 @@ if __name__ == '__main__':
     local_rank = distributed.get_rank()
     torch.cuda.set_device(local_rank)
     device = torch.device("cuda", local_rank)
-    checkpoints_dir = '/data/data_dyh/kdd_ckpt/ckpt_main/checkpoints4'
+    checkpoints_dir = './checkpoints1'
     start_epoch = 0
     use_bert = True
     if not os.path.exists(checkpoints_dir) and local_rank == 0:

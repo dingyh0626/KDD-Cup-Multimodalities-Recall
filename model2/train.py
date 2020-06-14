@@ -22,7 +22,7 @@ from torch.optim.lr_scheduler import ExponentialLR
 
 from model import ScoreModel, ImageEncoder
 # from image_encoders import ImageEncoder
-from utils_backup import Dataset, collate_fn, DataLoader
+from utils import Dataset, collate_fn, DataLoader
 from tqdm import tqdm
 import torch.nn.functional as F
 
@@ -37,7 +37,7 @@ if __name__ == '__main__':
     local_rank = distributed.get_rank()
     torch.cuda.set_device(local_rank)
     device = torch.device("cuda", local_rank)
-    checkpoints_dir = './checkpoints4'
+    checkpoints_dir = './checkpoints2'
     start_epoch = 0
     use_bert = True
     if not os.path.exists(checkpoints_dir) and local_rank == 0:

@@ -87,13 +87,15 @@ class Dataset(dataset.Dataset):
         #     self.products = pickle.load(f)
 
         self.root_dir = root_dir
-        data = []
-        for i in range(6):
-            with open(os.path.join(root_dir, 'data_index_%d.pkl' % i), 'rb') as f:
-                data += pickle.load(f)
-        data = pd.DataFrame(data, columns=['product_id', 'image_h', 'image_w', 'num_boxes', 'class_labels', 'query',
-                                           'query_id'])
-        data.set_index('product_id', inplace=True)
+        # data = []
+        # for i in range(6):
+        #     with open(os.path.join(root_dir, 'data_index_%d.pkl' % i), 'rb') as f:
+        #         data += pickle.load(f)
+        # data = pd.DataFrame(data, columns=['product_id', 'image_h', 'image_w', 'num_boxes', 'class_labels', 'query',
+        #                                    'query_id'])
+        # data.set_index('product_id', inplace=True)
+        with open(os.path.join(root_dir, 'data.pkl'), 'rb') as f:
+            data = pickle.load(f)
         with open(os.path.join(root_dir, 'data_info2.pkl'), 'rb') as f:
             map_info = pickle.load(f)
         self.lexicon = map_info['lexicon']

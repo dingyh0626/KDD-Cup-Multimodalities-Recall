@@ -2,6 +2,7 @@ import torch
 from torch import nn
 from transformers import BertModel, BertTokenizer, BertForMaskedLM
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence
+from torch.nn import functional as F
 pretrained_large = 'bert-large-uncased'
 pretrained_base = 'bert-base-uncased'
 
