@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '4'
+# os.environ["CUDA_VISIBLE_DEVICES"] = '4'
 import torch
 from model import ScoreModel, TextEncoder, ImageEncoder
 from utils import ValidDataset, collate_fn_valid, DataLoader

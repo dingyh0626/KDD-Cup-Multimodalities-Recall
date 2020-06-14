@@ -5,7 +5,7 @@ os.environ["NUMEXPR_NUM_THREADS"] = "1"  # export NUMEXPR_NUM_THREADS=1
 os.environ["OMP_NUM_THREADS"] = "1"  # export OMP_NUM_THREADS=1
 parser = argparse.ArgumentParser(description="train")
 parser.add_argument('--local_rank', type=int)
-parser.add_argument('--devices', type=int, nargs='+', default=[0,1])
+parser.add_argument('--devices', type=int, nargs='+', default=[0, 1])
 parser.add_argument('--addr', type=str, default="127.0.0.1")
 parser.add_argument('--port', type=str, default="7718")
 args = parser.parse_args()

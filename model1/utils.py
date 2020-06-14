@@ -133,66 +133,64 @@ class Dataset(dataset.Dataset):
         # while True:
         #     idx = random.choice(range(len(self)))
         #     row_ = self.data.iloc[idx]
-        #     query_id_negative = row_['query_id']
-        #     if query_id_negative != query_id:
-        #         query_negative = tokenizer.encode(row_['query'])
-        #         h_negative, w_negative = row_['image_h'], row_['image_w']
-        #         # query_negative = [self.lexicon.get(w, self.unknown_token) for w in re.split('[- ]', row_['query'].lower())]
+        #     query_id_neg = row_['query_id']
+        #     if query_id_neg != query_id:
+        #         query_neg = tokenizer.encode(row_['query'])
+        #         h_neg, w_neg = row_['image_h'], row_['image_w']
+        #         # query_neg = [self.lexicon.get(w, self.unknown_token) for w in re.split('[- ]', row_['query'].lower())]
         #         break
-        class_labels = row['class_labels']
+        # class_labels = row['class_labels']
 
         # category, category_len = process_category(self.category_label, class_labels, self.use_bert, self.lexicon, self.unknown_token)
         query_row = self.query.loc[query_id]
         last_word = query_row['last_word']
         cluster = query_row['cluster']
-        neg_query_id_set = list(set(self.last2query_id[last_word]).difference([query_id])) if random.random() > 0.2 else []
+        neg_query_id_set = list(
+            set(self.last2query_id[last_word]).difference([query_id])) if random.random() > 0.2 else []
         # neg_query_id_set = []
         while True:
-            # query_id_negative = random.choice(self.label_map_query[random.choice(class_labels)])
+            # query_id_neg = random.choice(self.label_map_query[random.choice(class_labels)])
             if len(neg_query_id_set) > 0:
-                query_id_negative = random.choice(neg_query_id_set)
+                query_id_neg = random.choice(neg_query_id_set)
             else:
-                query_id_negative = random.choice(self.cluster2query_id[cluster]) if random.random() > 0.5 else random.choice(self.query.index)
-            if query_id_negative != query_id:
-                query_negative = self.query.loc[query_id_negative, 'query']
-                query_negative = encode_text(query_negative, self.use_bert, self.lexicon, self.unknown_token)
+                query_id_neg = random.choice(self.cluster2query_id[cluster])
+            if query_id_neg != query_id:
+                query_neg = self.query.loc[query_id_neg, 'query']
+                query_neg = encode_text(query_neg, self.use_bert, self.lexicon, self.unknown_token)
                 # category = [int(x) + 1 for x in class_labels]
                 # category = query_row['tag']
-                # query_negative = [self.lexicon.get(w, self.unknown_token) for w in re.split('[- ]', query_negative.lower())]
+                # query_neg = [self.lexicon.get(w, self.unknown_token) for w in re.split('[- ]', query_neg.lower())]
                 break
 
         query = np.asarray(query)
-        query_negative = np.asarray(query_negative)
+        query_neg = np.asarray(query_neg)
         query_len = len(query)
-        query_negative_len = len(query_negative)
+        query_neg_len = len(query_neg)
 
         product_positive_list = list(query_row['product_id'])
-        neg_query_id_set = list(
-            set(self.last2query_id[last_word]).difference([query_id])) if random.random() > 0.2 else []
         while True:
-            # product_id_negative = random.choice(self.label_map_product[random.choice(class_labels)])
+            # product_id_neg = random.choice(self.label_map_product[random.choice(class_labels)])
             if len(neg_query_id_set) > 0:
                 query_row = self.query.loc[random.choice(neg_query_id_set)]
             else:
-                id_ = random.choice(self.cluster2query_id[cluster]) if random.random() > 0.5 else random.choice(self.query.index)
-                query_row = self.query.loc[id_]
-            product_id_negative = random.choice(query_row['product_id'])
-            # product_id_negative = random.choice(self.last2product_id[last_word])
-            if product_id_negative not in product_positive_list:
-                row_ = self.data.loc[product_id_negative]
-                h_negative, w_negative = row_['image_h'], row_['image_w']
-                # category_negative = [int(x) + 1 for x in row_['class_labels']]
-                # category_negative = query_row['tag']
-                # category_negative, category_negative_len = process_category(self.category_label, row_['class_labels'], self.use_bert, self.lexicon, self.unknown_token)
+                query_row = self.query.loc[random.choice(self.cluster2query_id[cluster])]
+            product_id_neg = random.choice(query_row['product_id'])
+            # product_id_neg = random.choice(self.last2product_id[last_word])
+            if product_id_neg not in product_positive_list:
+                row_ = self.data.loc[product_id_neg]
+                h_neg, w_neg = row_['image_h'], row_['image_w']
+                # category_neg = [int(x) + 1 for x in row_['class_labels']]
+                # category_neg = query_row['tag']
+                # category_neg, category_neg_len = process_category(self.category_label, row_['class_labels'], self.use_bert, self.lexicon, self.unknown_token)
                 break
 
         # feature_product_positive = self.products.get(product_positive)
 
-        # feature_product_negative = self.products.get(product_negative)
+        # feature_product_neg = self.products.get(product_neg)
         feature_product = np.load(os.path.join(self.root_dir, 'features', '{}.npz'.format(product_id)))
 
-        feature_product_negative = np.load(os.path.join(self.root_dir,
-                                                        'features', '{}.npz'.format(product_id_negative)))
+        feature_product_neg = np.load(os.path.join(self.root_dir,
+                                                   'features', '{}.npz'.format(product_id_neg)))
 
         boxes_ = feature_product['boxes']
         h, w = row['image_h'], row['image_w']
@@ -205,18 +203,18 @@ class Dataset(dataset.Dataset):
         features = feature_product['features']
         obj_len = len(boxes)
 
-        boxes_negative_ = feature_product_negative['boxes']
-        boxes_negative = np.zeros((len(boxes_negative_), 5))
-        boxes_negative[:, 0] = boxes_negative_[:, 0] / h_negative
-        boxes_negative[:, 2] = boxes_negative_[:, 2] / h_negative
-        boxes_negative[:, 1] = boxes_negative_[:, 1] / w_negative
-        boxes_negative[:, 3] = boxes_negative_[:, 3] / w_negative
-        boxes_negative[:, 4] = (boxes_negative[:, 3] - boxes_negative[:, 1]) * (boxes_negative[:, 2] - boxes_negative[:, 0])
-        features_negative = feature_product_negative['features']
-        obj_negative_len = len(boxes_negative)
+        boxes_neg_ = feature_product_neg['boxes']
+        boxes_neg = np.zeros((len(boxes_neg_), 5))
+        boxes_neg[:, 0] = boxes_neg_[:, 0] / h_neg
+        boxes_neg[:, 2] = boxes_neg_[:, 2] / h_neg
+        boxes_neg[:, 1] = boxes_neg_[:, 1] / w_neg
+        boxes_neg[:, 3] = boxes_neg_[:, 3] / w_neg
+        boxes_neg[:, 4] = (boxes_neg[:, 3] - boxes_neg[:, 1]) * (boxes_neg[:, 2] - boxes_neg[:, 0])
+        features_neg = feature_product_neg['features']
+        obj_neg_len = len(boxes_neg)
 
-        return query_id, product_id, query, query_len, features, boxes, obj_len,\
-               query_negative, query_negative_len, features_negative, boxes_negative, obj_negative_len
+        return query_id, product_id, query, query_len, features, boxes, obj_len, \
+               query_neg, query_neg_len, features_neg, boxes_neg, obj_neg_len
 
 
 class ValidDataset(dataset.Dataset):

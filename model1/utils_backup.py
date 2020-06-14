@@ -141,8 +141,7 @@ class Dataset(dataset.Dataset):
             if len(neg_query_id_set) > 0:
                 query_id_negative = random.choice(neg_query_id_set)
             else:
-                query_id_negative = random.choice(
-                    self.cluster2query_id[cluster]) if random.random() > 0.5 else random.choice(self.query.index)
+                query_id_negative = self.cluster2query_id[cluster]
             if query_id_negative != query_id:
                 query_negative = self.query.loc[query_id_negative, 'query']
                 query_negative = encode_text(query_negative, self.use_bert, self.lexicon, self.unknown_token)
@@ -157,15 +156,12 @@ class Dataset(dataset.Dataset):
         query_negative_len = len(query_negative)
 
         product_positive_list = list(query_row['product_id'])
-        neg_query_id_set = list(
-            set(self.last2query_id[last_word]).difference([query_id])) if random.random() > 0.2 else []
         while True:
             # product_id_negative = random.choice(self.label_map_product[random.choice(class_labels)])
             if len(neg_query_id_set) > 0:
                 query_row = self.query.loc[random.choice(neg_query_id_set)]
             else:
-                id_ = random.choice(self.cluster2query_id[cluster]) if random.random() > 0.5 else random.choice(
-                    self.query.index)
+                id_ = random.choice(self.cluster2query_id[cluster])
                 query_row = self.query.loc[id_]
             product_id_negative = random.choice(query_row['product_id'])
             # product_id_negative = random.choice(self.last2product_id[last_word])
