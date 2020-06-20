@@ -37,7 +37,7 @@ if __name__ == '__main__':
     local_rank = distributed.get_rank()
     torch.cuda.set_device(local_rank)
     device = torch.device("cuda", local_rank)
-    checkpoints_dir = './checkpoints2'
+    checkpoints_dir = './checkpoints'
     start_epoch = 0
     use_bert = True
     if not os.path.exists(checkpoints_dir) and local_rank == 0:
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     nhead = 4
     score_model = ScoreModel(kdd_dataset.unknown_token + 1, 1024, 1024, use_bert=use_bert).cuda()
     image_encoder = ImageEncoder(input_dim=2048, output_dim=1024, nhead=nhead)
-    image_encoder.load_pretrained_weights()
+    image_encoder.load_pretrained_weights(path='../user_data/image_encoder_large.pth')
     image_encoder = image_encoder.cuda()
     # text_generator = TextGenerator(score_model.embed.num_embeddings).cuda()
     # score_model = ScoreModel(30522, 256, num_heads=1).cuda()

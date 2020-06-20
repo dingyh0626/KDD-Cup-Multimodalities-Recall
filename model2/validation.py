@@ -31,7 +31,7 @@ def read_json(path):
         return json.load(f)
 
 
-def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=None, out_path='valid_pred2.json', output_ndcg=True):
+def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=None, out_path='../prediction_result/valid_pred.json', output_ndcg=True):
     print("valid epoch{}".format(epoch))
     if data_path is not None:
         kdd_dataset = ValidDataset(data_path, use_bert=use_bert)
@@ -45,8 +45,8 @@ def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=No
     score_model = ScoreModel(kdd_dataset.unknown_token + 1, 1024, 1024, use_bert=use_bert).cuda()
     image_encoder = ImageEncoder(input_dim=2048, output_dim=1024, nhead=nhead).cuda()
     checkpoints = torch.load(os.path.join(checkpoints_dir, 'model-epoch{}.pth'.format(epoch)))
-    score_model.load_state_dict(checkpoints['query'])
-    image_encoder.load_state_dict(checkpoints['score'])
+    score_model.load_state_dict(checkpoints['score'])
+    image_encoder.load_state_dict(checkpoints['item'])
     outputs = {}
     score_model.eval()
     image_encoder.eval()
@@ -72,11 +72,9 @@ def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=No
     with open(out_path, 'w') as f:
         json.dump(outputs, f)
 
-    pred = read_json(out_path)
-    gt = read_json('/share/wulei/kdd-data/valid_answer.json')
     if output_ndcg:
         pred = read_json(out_path)
-        gt = read_json('/share/wulei/kdd-data/valid_answer.json')
+        gt = read_json('../data/valid/valid_answer.json')
         score = 0
         k = 5
         for key, val in gt.items():
@@ -98,13 +96,20 @@ def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=No
 
 
 if __name__ == '__main__':
-    test_path = '/share/wulei/kdd-data/testB.tsv'
-    valid_path = '/share/wulei/kdd-data/valid.tsv'
-    checkpoints_dir = '/data/data_dyh/kdd_ckpt/ckpt_main/checkpoints3'
-    epoch = 2
+    import argparse
+    parser = argparse.ArgumentParser(description="valid")
+    parser.add_argument('--checkpoints_dir', type=str, default='./ckpt')
+    parser.add_argument('--epoch', type=int, default=2)
+    parser.add_argument('--valid_out_path', type=str, default='../prediction_result/valid_pred_model2.json')
+    parser.add_argument('--test_out_path', type=str, default='../prediction_result/test_pred_model2.json')
+    args = parser.parse_args()
+    test_path = '../data/testB/testB.tsv'
+    valid_path = '../data/valid/valid.tsv'
+    checkpoints_dir = args.checkpoints_dir
+    epoch = args.epoch
     # output validation prediction
     valid(epoch, checkpoints_dir, use_bert=True,
-          data_path=valid_path, out_path='valid2_pred.json', output_ndcg=True)
+          data_path=valid_path, out_path=args.valid_out_path, output_ndcg=True)
     # output testing prediction
     valid(epoch, checkpoints_dir, use_bert=True,
-          data_path=test_path, out_path='test2_pred.json', output_ndcg=False)
+          data_path=test_path, out_path=args.test_out_path, output_ndcg=False)

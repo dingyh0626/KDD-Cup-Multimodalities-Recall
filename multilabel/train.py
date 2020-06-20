@@ -1,5 +1,5 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = '2'
+os.environ["CUDA_VISIBLE_DEVICES"] = '0'
 import torch
 from torch.optim import Adam, SGD
 from torch.optim.lr_scheduler import ExponentialLR

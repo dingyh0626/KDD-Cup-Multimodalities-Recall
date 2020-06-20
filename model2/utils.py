@@ -207,7 +207,7 @@ class Dataset(dataset.Dataset):
 
 
 class ValidDataset(dataset.Dataset):
-    def __init__(self, path_tsv='/share/wulei/kdd-data/valid.tsv', path_map_info='/home/dingyuhui/dataset/kdd-data/data_info2.pkl', path_label='/home/dingyuhui/dataset/kdd-data/multimodal_labels.txt', use_bert=False):
+    def __init__(self, path_tsv='../data/valid/valid.tsv', path_map_info='../data/info/data_info2.pkl', path_label='../data/multimodal_labels.txt', use_bert=False):
         super(ValidDataset, self).__init__()
         with open(os.path.join(path_map_info), 'rb') as f:
             map_info = pickle.load(f)

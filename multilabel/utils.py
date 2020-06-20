@@ -67,7 +67,7 @@ def encode_text(text, use_bert=False, lexicon=None, unknown_token=None, pattern=
 
 
 class Dataset(dataset.Dataset):
-    def __init__(self, root_dir='/home/dingyuhui/dataset/kdd-data', use_bert=False):
+    def __init__(self, root_dir='../data', use_bert=False):
         super(Dataset, self).__init__()
         self.use_bert = use_bert
         # pool = Pool(16)
@@ -94,9 +94,9 @@ class Dataset(dataset.Dataset):
         # data = pd.DataFrame(data, columns=['product_id', 'image_h', 'image_w', 'num_boxes', 'class_labels', 'query',
         #                                    'query_id'])
         # data.set_index('product_id', inplace=True)
-        with open(os.path.join(root_dir, 'data.pkl'), 'rb') as f:
+        with open(os.path.join(root_dir, 'info', 'data.pkl'), 'rb') as f:
             data = pickle.load(f)
-        with open(os.path.join(root_dir, 'data_info2.pkl'), 'rb') as f:
+        with open(os.path.join(root_dir, 'info', 'data_info2.pkl'), 'rb') as f:
             map_info = pickle.load(f)
         self.lexicon = map_info['lexicon']
         self.unknown_token = max(self.lexicon.values()) + 1
@@ -146,7 +146,7 @@ class Dataset(dataset.Dataset):
 
 
 class ValidDataset(dataset.Dataset):
-    def __init__(self, path_tsv='/share/wulei/kdd-data/valid.tsv', path_map_info='/home/dingyuhui/dataset/kdd-data/data_info2.pkl', path_label='/home/dingyuhui/dataset/kdd-data/multimodal_labels.txt', use_bert=False):
+    def __init__(self, path_tsv='../data/valid/valid.tsv', path_map_info='../data/info/data_info2.pkl', use_bert=False):
         super(ValidDataset, self).__init__()
         with open(os.path.join(path_map_info), 'rb') as f:
             map_info = pickle.load(f)

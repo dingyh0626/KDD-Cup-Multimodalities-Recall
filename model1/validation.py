@@ -30,7 +30,7 @@ def read_json(path):
         return json.load(f)
 
 
-def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=None, out_path='valid_pred1.json', output_ndcg=True):
+def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=None, out_path='../prediction_result/valid_pred.json', output_ndcg=True):
     print("valid epoch{}".format(epoch))
     if data_path is not None:
         kdd_dataset = ValidDataset(data_path, use_bert=use_bert)
@@ -74,7 +74,7 @@ def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=No
         json.dump(outputs, f)
     if output_ndcg:
         pred = read_json(out_path)
-        gt = read_json('/share/wulei/kdd-data/valid_answer.json')
+        gt = read_json('../data/valid/valid_answer.json')
         score = 0
         k = 5
         for key, val in gt.items():
@@ -96,15 +96,22 @@ def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, data_path=No
 
 
 if __name__ == '__main__':
-    test_path = '/share/wulei/kdd-data/testB.tsv'
-    valid_path = '/share/wulei/kdd-data/valid.tsv'
-    checkpoints_dir = '/data/data_dyh/kdd_ckpt/ckpt_main/checkpoints4'
-    epoch = 5
+    import argparse
+    parser = argparse.ArgumentParser(description="valid")
+    parser.add_argument('--checkpoints_dir', type=str, default='./ckpt')
+    parser.add_argument('--epoch', type=int, default=5)
+    parser.add_argument('--valid_out_path', type=str, default='../prediction_result/valid_pred_model1.json')
+    parser.add_argument('--test_out_path', type=str, default='../prediction_result/test_pred_model1.json')
+    args = parser.parse_args()
+    test_path = '../data/testB/testB.tsv'
+    valid_path = '../data/valid/valid.tsv'
+    checkpoints_dir = args.checkpoints_dir
+    epoch = args.epoch
     # output validation prediction
     valid(epoch, checkpoints_dir, use_bert=True,
-          data_path=valid_path, out_path='valid1_pred.json', output_ndcg=True)
+          data_path=valid_path, out_path=args.valid_out_path, output_ndcg=True)
     # output testing prediction
     valid(epoch, checkpoints_dir, use_bert=True,
-          data_path=test_path, out_path='test1_pred.json', output_ndcg=False)
+          data_path=test_path, out_path=args.test_out_path, output_ndcg=False)
 
 

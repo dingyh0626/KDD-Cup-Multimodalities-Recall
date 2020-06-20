@@ -102,11 +102,11 @@ def valid(epoch=1, checkpoints_dir='./checkpoints', use_bert=False, large=False)
         v = [str(x[0]) for x in v]
         outputs[k] = v
 
-    with open('valid_pred.json', 'w') as f:
+    with open('../prediction_result/valid_pred.json', 'w') as f:
         json.dump(outputs, f)
 
-    pred = read_json('valid_pred.json')
-    gt = read_json('/share/wulei/kdd-data/valid_answer.json')
+    pred = read_json('../prediction_result/valid_pred.json')
+    gt = read_json('../data/valid/kdd-data/valid_answer.json')
     score = 0
     k = 5
     for key, val in gt.items():
