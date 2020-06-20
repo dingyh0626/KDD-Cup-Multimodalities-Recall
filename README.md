@@ -41,19 +41,19 @@ git链接：[https://github.com/IntoxicatedDING/KDD-Cup-Multimodalities-Recall.g
 	|-- testB
 		|-- testB.tsv
 	|-- info
-	    |-- data.pkl（剥除base64数据）
-	    |-- data_info2.pkl（聚类、字典等信息）
-	    |-- query2product2.pkl（查询文本到物品的映射）
+	    	|-- data.pkl（剥除base64数据）
+	    	|-- data_info2.pkl（聚类、字典等信息）
+	    	|-- query2product2.pkl（查询文本到物品的映射）
 	    
 |-- user_data
-    |-- image_encoder_large.pth（图片编码器预训练模型，未上传）
+    	|-- image_encoder_large.pth（图片编码器预训练模型，未上传）
 
 |-- external_resources
-    |--test_pred_model1.json
-    |--valid_pred_model1.json
-    |--test_pred_model2.json
-    |--valid_pred_model2.json
-    |--submission.csv
+    	|--test_pred_model1.json
+    	|--valid_pred_model1.json
+    	|--test_pred_model2.json
+    	|--valid_pred_model2.json
+    	|--submission.csv
 	 
 ```
 
